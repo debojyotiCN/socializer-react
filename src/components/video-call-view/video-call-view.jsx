@@ -4,6 +4,7 @@ import LocalUserVideoWindow from "../local-user-video-window/local-user-video-wi
 import RemoteUserVideoWindow from "../remote-user-video-window/remote-user-video-window";
 import { connect as TwilioConnect } from "twilio-video";
 import { getVideoCallToken } from "../../http-calls";
+import { extractQueryParams } from "../../helper-methods";
 
 class VideoCallView extends Component {
   state = {
@@ -13,7 +14,12 @@ class VideoCallView extends Component {
   };
 
   componentDidMount() {
-    this.joinRoom();
+    const params = extractQueryParams();
+    if (params.id) {
+      this.setState({ identity: params.id }, () => {
+        this.joinRoom();
+      });
+    }
   }
 
   registerEventListners = () => {
