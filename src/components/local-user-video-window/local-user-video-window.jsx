@@ -24,8 +24,8 @@ class LocalUserVideoWindow extends Component {
     
     return (
       <>
-        <div className="video">
-          <div className="videoWindow" id={this.props.participant.identity}>
+        <div className="video localUserVideoWindow">
+          <div className="videoWindow localUserVideoWindow" id={this.props.participant.identity}>
             <div className="videoPlaceholder">
               {tracks.map((track) => (
                 <TwilioVideoAudioView
@@ -37,10 +37,13 @@ class LocalUserVideoWindow extends Component {
               <div className="videoMask"></div>
               <div className="videoOptions">
                 <div className="name">
-                  {" "}
+                  <button className="toggleButton active">
                   <i className="fas fa-microphone"></i> &nbsp;{" "}
+                  </button>
+                  <button className="toggleButton">
                   <i className="fas fa-video"></i> &nbsp;{" "}
-                  {this.props.participant.identity}
+                  </button>
+                  {this.props.participant.identity} (You)
                 </div>
               </div>
             </div>
