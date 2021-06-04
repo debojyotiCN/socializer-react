@@ -1,15 +1,16 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { PersistGate } from "redux-persist/integration/react";
-import { persistor, store } from "./redux/store";
 import { Provider } from "react-redux";
-import HomePage from './pages/home-page';
-import ProtectedRoute from './components/protected-routes';
-import LoginPage from './pages/login-page';
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import {
+  ToastsContainer,
+  ToastsContainerPosition,
+  ToastsStore,
+} from "react-toasts";
+import { PersistGate } from "redux-persist/integration/react";
 import FullPageLoader from "./containers/full-page-loader";
-import { ToastsContainer, ToastsStore, ToastsContainerPosition } from "react-toasts";
-import VideoCallPage from "./pages/video-call-page/video-call-page";
+import GamePage from "./pages/game-page/game-page";
 import RoomConnectorPage from "./pages/room-connector-page/room-connector-page";
+import { persistor, store } from "./redux/store";
 
 function App() {
   return (
@@ -18,10 +19,13 @@ function App() {
         <Router>
           <div>
             <FullPageLoader></FullPageLoader>
-            <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.BOTTOM_RIGHT} />
+            <ToastsContainer
+              store={ToastsStore}
+              position={ToastsContainerPosition.BOTTOM_RIGHT}
+            />
             <Switch>
-              <Route path="/room" component={VideoCallPage} /> 
-              <Route path="*" component={RoomConnectorPage} /> 
+              <Route path="/room" component={GamePage} />
+              <Route path="*" component={RoomConnectorPage} />
             </Switch>
           </div>
         </Router>
