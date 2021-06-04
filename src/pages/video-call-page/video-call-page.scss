@@ -1,0 +1,168 @@
+.gameWRapper {
+  $medium: 769px;
+  $small: 360px;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  font-family: 'Titillium Web', sans-serif;
+
+  @media screen and (max-width: $medium) {
+    flex-direction: column;
+  }
+
+  .videoWindowWrapper {
+    flex: 7;
+    height: 100%;
+    @media screen and (max-width: $medium) {
+      height: 70vh;
+    }
+
+    .videoWrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      height: 100%;
+      width: 100%;
+
+      .video {
+        // flex: 1;
+        width: 50%;
+        height: 50%;
+        // background-color: white;
+
+        .videoWindow {
+          width: 100%;
+          height: 100%;
+          padding: 1px;
+
+          .videoPlaceholder {
+            background-color: rgb(104, 104, 104);
+            width: 100%;
+            height: 100%;
+            position: relative;
+
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+
+            .videoMask {
+              position: absolute;
+              display: none;
+              top: 0;
+              right: 0;
+              width: 100%;
+              height: 100%;
+              cursor: pointer;
+
+            }
+
+            .videoOptions {
+              position: absolute;
+              bottom: 0;
+              left: 0;
+              height: 50px;
+              width: 100%;
+
+              // background-color: green;
+              .name {
+                background-color: rgba(255, 255, 255, 0.637);
+                width: 30%;
+
+                @media screen and (max-width: $medium) {
+                  width: 85%;
+                }
+
+                border-radius: 600px;
+                padding: 7px 0;
+                margin: 7px 15px;
+                text-align: center;
+                font-size: 0.8rem;
+                color: rgb(27, 27, 27);
+                text-shadow: 0 0 2px rgb(22, 22, 22),
+                0 0 2px rgbrgb(12, 12, 12)
+              }
+            }
+
+            &:hover {
+              .videoMask {
+                display: unset;
+                box-shadow: 0px 0px 200px rgba(26, 26, 26, 0.808) inset;
+              }
+
+              .name {
+                background-color: rgba(255, 255, 255, 0.986);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .questionSectionWrapper {
+    flex: 3;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    @media screen and (max-width: $medium) {
+      height: 30vh;
+    }
+
+    .questionWrapper {
+      width: 60%;
+      @media screen and (max-width: $medium) {
+        width: 90%;
+      }
+
+      h3 {
+        font-weight: 600;
+        text-align: center;
+      }
+
+      .answers {
+        display: flex;
+        justify-content: center;
+        margin-top: 3rem;
+        align-items: center;
+        flex-direction: column;
+        
+
+        .answer {
+          padding: 8px 16px;
+          color: white;
+          transition: 0.4s;
+          width: 95%;
+          border: 1px solid black;
+          text-align: center;
+          background-color: rgb(27, 27, 27);
+          border-radius: 30px;
+          font-size: 0.8rem;
+          margin: 3px 0;
+          cursor: pointer;
+
+          &:hover {
+            background-color: rgb(226, 226, 226);
+            color: black;
+          }
+        }
+
+        @media screen and (max-width: $medium) {
+          flex-direction: row;
+          flex-wrap: wrap;
+          margin-top: 0rem;
+          .answer {
+            margin: 3px 2px;
+            width: 48%;
+          }
+        }
+      }
+    }
+  }
+}
