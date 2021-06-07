@@ -1,18 +1,35 @@
 import { BASE_URL } from '../config/index';
 import { makePostRequest, makeGetRequestNonJSON } from '../http-connectors';
 
-export const login = loginData => {
+export const joinRoom = payload => {
   return new Promise((resolve, reject) => {
     makePostRequest(
-      BASE_URL + "5da203dc2f00007900f418fa",
+      `${process.env.REACT_APP_GAME_SERVER_BASE_URL}/joinRoom`,
       false,
-      loginData
+      payload
     )
       .then(res => {
         resolve(res);
       })
       .catch(e => {
-        console.log("API call error: ", e);
+        console.log("joinRoom error: ", e);
+        reject(e);
+      });
+  });
+};
+
+export const createRoom = payload => {
+  return new Promise((resolve, reject) => {
+    makePostRequest(
+      `${process.env.REACT_APP_GAME_SERVER_BASE_URL}/createRoom`,
+      false,
+      payload
+    )
+      .then(res => {
+        resolve(res);
+      })
+      .catch(e => {
+        console.log("createRoom error: ", e);
         reject(e);
       });
   });

@@ -1,10 +1,16 @@
 import { logout } from "../helper-methods";
 
-export const handleErrorIfAvailable = httpResponse => {
+export const handleErrorIfAvailable = async httpResponse => {
     switch(httpResponse.status) {
-        case 401: {
+        case 200: {
             // Token expired
-            logout();
+            // logout();
+            break;
+        }
+        default: {
+            const error = await httpResponse.json(); 
+            console.log('error :>> ', error);
+            throw error;
         }
     }
 } 

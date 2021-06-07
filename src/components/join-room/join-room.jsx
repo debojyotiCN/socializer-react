@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { joinRoom } from "../../http-calls";
 
 class JoinRoom extends Component {
   state = {
@@ -102,15 +103,27 @@ class JoinRoom extends Component {
 
   _validateAndSubmit = async (e) => {
     e.preventDefault();
-    const { formFields, isFormValid, redirectTo } = this.state;
     await this._makeAllFieldDirty();
     await this._validateForm();
+    const { formFields, isFormValid } = this.state;
     if (isFormValid) {
       try {
         this._toggleLoader(true);
-      } catch (loginError) {
+        const payload = {
+          "userName": formFields.userName.value,
+          "roomId": formFields.roomId.value
+        }
+        const roomResponse = await joinRoom(payload);
+        console.log('roomResponse :>> ', roomResponse);
         this._toggleLoader(false);
-        this._showError("Login server error");
+      } catch (loginError) {
+        console.log('loginError :>> ', loginError);
+        this._toggleLoader(false);
+        if (loginError && loginError.errorMessage && loginError.errorMessage.length) {
+          this._showError(loginError.errorMessage);
+        } else {
+          this._showError("Not allowed to join the room");
+        }
       }
     }
   };
