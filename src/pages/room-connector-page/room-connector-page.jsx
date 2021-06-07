@@ -1,9 +1,31 @@
 import React, { Component } from "react";
 import "./room-connector-page.scss";
+import CreateRoom from "../../components/create-room/create-room";
+import JoinRoom from "../../components/join-room/join-room";
 
 class RoomConnectorPage extends Component {
-  state = {};
+  state = {
+    activeMode: "joinRoom",
+  };
+
+  _setActiveMode = (mode) => {
+    this.setState({ activeMode: mode });
+  };
+
+  _renderActiveMode = () => {
+    const { activeMode } = this.state;
+    switch (activeMode) {
+      case "joinRoom": {
+        return <JoinRoom />;
+      }
+      case "createRoom": {
+        return <CreateRoom />;
+      }
+    }
+  };
+
   render() {
+    const { activeMode } = this.state;
     return (
       <>
         <div className="roomConnectorPageWrapper">
@@ -11,22 +33,20 @@ class RoomConnectorPage extends Component {
           <div className="roomConnetor">
             <h3>Socializer</h3>
             <div className="tabButtons">
-              <button className="tabBtn active">Join a room</button>
-              <button className="tabBtn">Create a room</button>
+              <button
+                className={`tabBtn ${activeMode === "joinRoom" && "active"}`}
+                onClick={(e) => this._setActiveMode("joinRoom")}
+              >
+                Join a room
+              </button>
+              <button
+                className={`tabBtn ${activeMode === "createRoom" && "active"}`}
+                onClick={(e) => this._setActiveMode("createRoom")}
+              >
+                Create a room
+              </button>
             </div>
-            <div className="tabContent">
-              <div className="inputWrapper">
-                <div className="label">Room Id</div>
-                <input type="text" />
-              </div>
-              <div className="inputWrapper">
-                <div className="label">User Name</div>
-                <input type="text" />
-              </div>
-              <button className="submitBtn">Join</button>
-              {/* <div className="progressViewer">Please wait</div> */}
-              <p className="errorText">Something wrong happended</p>
-            </div>
+            {this._renderActiveMode()}
           </div>
         </div>
       </>
