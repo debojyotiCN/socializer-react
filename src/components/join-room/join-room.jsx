@@ -3,6 +3,7 @@ import { joinRoom } from "../../http-calls";
 import { connect } from "react-redux";
 import { updateUserData } from "../../redux/actions/user-data";
 import SocketHelper from "../../socket-helper";
+import { extractQueryParams } from "../../helper-methods";
 
 class JoinRoom extends Component {
   state = {
@@ -22,6 +23,30 @@ class JoinRoom extends Component {
     redirectTo: null,
     errorText: "",
     isLoading: false,
+  };
+
+  componentDidMount() {
+    this._tryAutoFill();
+  }
+
+  _tryAutoFill = () => {
+    const params = extractQueryParams();
+    const { roomId, userName } = params;
+    const { formFields } = this.state;
+
+    if (roomId && roomId.length) {
+      formFields.roomId.value = roomId;
+    }
+
+    if (userName && userName.length) {
+      formFields.userName.value = userName;
+    }
+
+    this.setState({ formFields }, () => {
+      if (roomId && roomId.length && userName && userName.length) {
+        this._validateAndSubmit();
+      }
+    });
   };
 
   _markAsDirty = (fieldName) => {
@@ -105,7 +130,9 @@ class JoinRoom extends Component {
   };
 
   _validateAndSubmit = async (e) => {
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();
+    }
     await this._makeAllFieldDirty();
     await this._validateForm();
     const { formFields, isFormValid } = this.state;
@@ -113,26 +140,35 @@ class JoinRoom extends Component {
       try {
         this._toggleLoader(true);
         const payload = {
-          "userName": formFields.userName.value,
-          "roomId": formFields.roomId.value
-        }
+          userName: formFields.userName.value,
+          roomId: formFields.roomId.value,
+        };
         const roomResponse = await joinRoom(payload);
         // Successfully connected
-        const currentUser = roomResponse.data.room.users.find(user => user.userName === formFields.userName.value); 
+        const currentUser = roomResponse.data.room.users.find(
+          (user) => user.userName === formFields.userName.value
+        );
         this.props.updateUserData({
           ...roomResponse.data.room,
-          currentUser
-        })
+          currentUser,
+        });
         // Establish socket connection
-        SocketHelper.connect(roomResponse.data.room.roomId, currentUser.userName);
+        SocketHelper.connect(
+          roomResponse.data.room.roomId,
+          currentUser.userName
+        );
         // Load game page
         this.props.loadGamePage();
         this._toggleLoader(false);
         this._toggleLoader(false);
       } catch (loginError) {
-        console.log('loginError :>> ', loginError);
+        console.log("loginError :>> ", loginError);
         this._toggleLoader(false);
-        if (loginError && loginError.errorMessage && loginError.errorMessage.length) {
+        if (
+          loginError &&
+          loginError.errorMessage &&
+          loginError.errorMessage.length
+        ) {
           this._showError(loginError.errorMessage);
         } else {
           this._showError("Not allowed to join the room");
@@ -179,19 +215,16 @@ class JoinRoom extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
-    userData: state.userData
+    userData: state.userData,
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    updateUserData: userData => dispatch(updateUserData(userData))
+    updateUserData: (userData) => dispatch(updateUserData(userData)),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(JoinRoom);
+export default connect(mapStateToProps, mapDispatchToProps)(JoinRoom);
