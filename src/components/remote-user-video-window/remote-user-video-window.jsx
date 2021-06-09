@@ -74,13 +74,12 @@ class RemoteUserVideoWindow extends Component {
               <div className="videoOptions">
                 <div className="name">
                   {" "}
-                  <i className="fas fa-microphone"></i> &nbsp;{" "}
-                  <i className="fas fa-video"></i> &nbsp;{" "}
+                  <i className="fas fa-user"></i> &nbsp;{" "}
                   {this.props.participant.identity}
                 </div>
               </div>
               {
-                userAnswer.isVisible? (<div className="answer">{userAnswer.value}</div>): <></>
+                userAnswer.isVisible? (<div className="answer">{this.props.participant.identity} answered: <strong>{userAnswer.value}</strong></div>): <></>
               }
             </div>
           </div>
