@@ -1,10 +1,15 @@
 import React, { Component } from "react";
 import "./remote-user-video-window.scss";
 import TwilioVideoAudioView from "../twilio-video-audio-view/twilio-video-audio-view";
+import EventEmitter from "../../utils/event-emitter";
 
 class RemoteUserVideoWindow extends Component {
   state = {
     tracks: [],
+    userAnswer: {
+      isVisible: false,
+      value: ""
+    }
   };
 
   componentDidMount() {
@@ -21,6 +26,27 @@ class RemoteUserVideoWindow extends Component {
     this.props.participant.on("trackSubscribed", (track) =>
       this.addTrack(track)
     );
+    this._initiateSocketEventListners();
+  }
+
+  _initiateSocketEventListners = () => {
+    EventEmitter.listen("user-answer", payload => {
+      const { participant } = this.props;
+      if (participant.identity === payload.userName) {
+        // Show user answer
+        this.setState({ userAnswer: {
+          isVisible: true,
+          value: payload.selectedAnswer.answerValue
+        } });
+      }
+    });
+    EventEmitter.listen("new-question", payload => {
+      // hide user answer
+      this.setState({ userAnswer: {
+        isVisible: false,
+        value: ""
+      } });
+    });
   }
 
   addTrack = (track) => {
@@ -30,7 +56,7 @@ class RemoteUserVideoWindow extends Component {
   };
 
   render() {
-    const { tracks } = this.state;
+    const { tracks, userAnswer } = this.state;
 
     return (
       <>
@@ -53,6 +79,9 @@ class RemoteUserVideoWindow extends Component {
                   {this.props.participant.identity}
                 </div>
               </div>
+              {
+                userAnswer.isVisible? (<div className="answer">{userAnswer.value}</div>): <></>
+              }
             </div>
           </div>
         </div>

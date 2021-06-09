@@ -5,18 +5,20 @@ import RemoteUserVideoWindow from "../remote-user-video-window/remote-user-video
 import { connect as TwilioConnect } from "twilio-video";
 import { getVideoCallToken } from "../../http-calls";
 import { extractQueryParams } from "../../helper-methods";
+import SocketHelper from "../../socket-helper";
 
 class VideoCallView extends Component {
   state = {
     identity: "111",
+    roomId: '',
     room: null,
     remoteParticipants: [],
   };
 
   componentDidMount() {
-    const params = extractQueryParams();
-    if (params.id) {
-      this.setState({ identity: params.id }, () => {
+    console.log('SocketHelper :>> ', SocketHelper.roomId);
+    if (SocketHelper.userName) {
+      this.setState({ identity: SocketHelper.userName, roomId: SocketHelper.roomId }, () => {
         this.joinRoom();
       });
     }
@@ -37,10 +39,10 @@ class VideoCallView extends Component {
   };
 
   joinRoom = async () => {
-    const { identity } = this.state;
+    const { identity, roomId } = this.state;
     
     try {
-      const token = await getVideoCallToken(identity, "roomName");
+      const token = await getVideoCallToken(identity, roomId);
       const room = await TwilioConnect(token, {
         name: "roomName",
         audio: true,

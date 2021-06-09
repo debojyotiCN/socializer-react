@@ -1,5 +1,8 @@
 import React, { Component } from "react";
 import { joinRoom } from "../../http-calls";
+import { connect } from "react-redux";
+import { updateUserData } from "../../redux/actions/user-data";
+import SocketHelper from "../../socket-helper";
 
 class JoinRoom extends Component {
   state = {
@@ -114,7 +117,17 @@ class JoinRoom extends Component {
           "roomId": formFields.roomId.value
         }
         const roomResponse = await joinRoom(payload);
-        console.log('roomResponse :>> ', roomResponse);
+        // Successfully connected
+        const currentUser = roomResponse.data.room.users.find(user => user.userName === formFields.userName.value); 
+        this.props.updateUserData({
+          ...roomResponse.data.room,
+          currentUser
+        })
+        // Establish socket connection
+        SocketHelper.connect(roomResponse.data.room.roomId, currentUser.userName);
+        // Load game page
+        this.props.loadGamePage();
+        this._toggleLoader(false);
         this._toggleLoader(false);
       } catch (loginError) {
         console.log('loginError :>> ', loginError);
@@ -166,4 +179,19 @@ class JoinRoom extends Component {
   }
 }
 
-export default JoinRoom;
+const mapStateToProps = state => {
+  return {
+    userData: state.userData
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    updateUserData: userData => dispatch(updateUserData(userData))
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(JoinRoom);

@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import "./room-connector-page.scss";
 import CreateRoom from "../../components/create-room/create-room";
 import JoinRoom from "../../components/join-room/join-room";
+import { connect } from "react-redux";
+import { updateUserData } from "../../redux/actions/user-data";
 
 class RoomConnectorPage extends Component {
   state = {
@@ -12,14 +14,18 @@ class RoomConnectorPage extends Component {
     this.setState({ activeMode: mode });
   };
 
+  _loadGamePage = () => {
+    this.props.history.push("/room")
+  }
+
   _renderActiveMode = () => {
     const { activeMode } = this.state;
     switch (activeMode) {
       case "joinRoom": {
-        return <JoinRoom />;
+        return <JoinRoom loadGamePage={this._loadGamePage} />;
       }
       case "createRoom": {
-        return <CreateRoom />;
+        return <CreateRoom loadGamePage={this._loadGamePage} />;
       }
     }
   };
@@ -54,4 +60,19 @@ class RoomConnectorPage extends Component {
   }
 }
 
-export default RoomConnectorPage;
+const mapStateToProps = state => {
+  return {
+    userData: state.userData
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    updateUserData: userData => dispatch(updateUserData(userData))
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(RoomConnectorPage);

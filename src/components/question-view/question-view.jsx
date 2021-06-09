@@ -1,25 +1,119 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import "./question-view.scss";
+import EventEmitter from "../../utils/event-emitter";
+import SocketHelper from "../../socket-helper";
 
 class QuestionView extends Component {
-  state = {  }
-  render() { 
-    return (  
+  state = {
+    question: null,
+    isSessionStarted: false,
+    isSessionComplete: false,
+    selectedAnswerId: null,
+  };
+
+  componentDidMount() {
+    this._initiateSocketEventListners();
+  }
+
+  _initiateSocketEventListners = () => {
+    EventEmitter.listen("session-started", (payload) => {
+      this.setState({
+        question: null,
+        isSessionStarted: true,
+        isSessionComplete: false,
+        selectedAnswerId: null,
+      });
+    });
+    EventEmitter.listen("new-question", (question) => {
+      this.setState({
+        question: question,
+        isSessionStarted: true,
+        isSessionComplete: false,
+        selectedAnswerId: null,
+      });
+    });
+    EventEmitter.listen("session-complete", (payload) => {
+      this.setState({
+        question: null,
+        isSessionStarted: true,
+        isSessionComplete: true,
+      });
+    });
+  };
+
+  _postAnswer = (answer) => {
+    const { question, selectedAnswerId } = this.state;
+    if (!selectedAnswerId) {
+      console.log('sublit :>> ', selectedAnswerId);
+      SocketHelper.postAnswer({
+        selectedAnswer: answer,
+        question,
+      });
+      this.setState({
+        selectedAnswerId: answer.answerId,
+      });
+    }
+  };
+
+  _determineAnswerClassname = (answer) => {
+    const { selectedAnswerId } = this.state;
+    if (selectedAnswerId === answer.answerId) {
+      return "answer selected";
+    } else {
+      return "answer";
+    }
+  };
+
+  render() {
+    const {
+      question,
+      selectedAnswerId,
+      isSessionStarted,
+      isSessionComplete,
+    } = this.state;
+
+    return (
       <>
-<div className="questionSectionWrapper">
-            <div className="questionWrapper">
-              <h3>Some sample question will go?</h3>
-              <div className="answers">
-                <div className="answer">Option 1</div>
-                <div className="answer">Option 2</div>
-                <div className="answer">Option 3</div>
-                <div className="answer">Option 4</div>
-              </div>
-            </div>
+        <div className="questionSectionWrapper">
+          <div className="questionWrapper">
+            {!isSessionStarted ? (
+              <>
+              <h3>Session will start soon</h3>
+            <p>Ask your friends to join to the room: <strong>{SocketHelper.roomId}</strong></p>
+              </>
+            ) : (
+              <>
+                {isSessionComplete ? (
+                  <h3>Thanks for participating!</h3>
+                ) : (
+                  <>
+                    {question ? (
+                      <>
+                        <h3>{question.questionText}</h3>
+                        <div className="answers">
+                          {question.answers.map((answer, answerIndex) => (
+                            <div
+                              className={this._determineAnswerClassname(answer)}
+                              key={answerIndex}
+                              onClick={(e) => this._postAnswer(answer)}
+                            >
+                              {answer.answerValue}
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <h3>Starting the session</h3>
+                    )}
+                  </>
+                )}
+              </>
+            )}
           </div>
+        </div>
       </>
     );
   }
 }
- 
+
 export default QuestionView;
