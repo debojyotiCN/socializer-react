@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import "./question-view.scss";
 import EventEmitter from "../../utils/event-emitter";
 import SocketHelper from "../../socket-helper";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import { showToast } from "../../helper-methods";
 
 class QuestionView extends Component {
   state = {
@@ -44,7 +46,7 @@ class QuestionView extends Component {
   _postAnswer = (answer) => {
     const { question, selectedAnswerId } = this.state;
     if (!selectedAnswerId) {
-      console.log('sublit :>> ', selectedAnswerId);
+      console.log("sublit :>> ", selectedAnswerId);
       SocketHelper.postAnswer({
         selectedAnswer: answer,
         question,
@@ -64,6 +66,10 @@ class QuestionView extends Component {
     }
   };
 
+  _onCopySuccess = (text) => {
+    showToast(text, "success");
+  };
+
   render() {
     const {
       question,
@@ -78,8 +84,40 @@ class QuestionView extends Component {
           <div className="questionWrapper">
             {!isSessionStarted ? (
               <>
-              <h3>Session will start soon</h3>
-            <p>Ask your friends to join to the room: <strong>{SocketHelper.roomId}</strong></p>
+                <h3>Session will start soon</h3>
+                <div className="roomJoinerWrapper">
+                  <p>Ask your friends to join to the room</p>
+                  <div className="joiningWrapper">
+                    <div className="label">Room ID</div>
+                    <div className="value">
+                      {SocketHelper.roomId}
+                      <button className="copy">
+                        <CopyToClipboard
+                          text={SocketHelper.roomId}
+                          onCopy={() => this._onCopySuccess("Room id copied!")}
+                        >
+                          <i className="fas fa-copy"></i>
+                        </CopyToClipboard>
+                      </button>
+                    </div>
+                  </div>
+                  <div className="joiningWrapper">
+                    <div className="label">Direct joining link</div>
+                    <div className="value">
+                      {`${window.location.origin}?roomId=${SocketHelper.roomId}`}
+                      <button className="copy">
+                        <CopyToClipboard
+                          text={`${window.location.origin}?roomId=${SocketHelper.roomId}`}
+                          onCopy={() =>
+                            this._onCopySuccess("Joining link copied!")
+                          }
+                        >
+                          <i className="fas fa-copy"></i>
+                        </CopyToClipboard>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </>
             ) : (
               <>
