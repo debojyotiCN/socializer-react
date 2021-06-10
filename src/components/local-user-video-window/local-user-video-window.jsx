@@ -69,9 +69,6 @@ class LocalUserVideoWindow extends Component {
                   <button className={isAudioEnabled? "toggleButton active": "toggleButton"} onClick={this.toggleAudio}>
                   <i className="fas fa-microphone"></i> &nbsp;{" "}
                   </button>
-                  <button className={isVideoEnabled? "toggleButton active": "toggleButton"} onClick={this.toggleVideo}>
-                  <i className="fas fa-video"></i> &nbsp;{" "}
-                  </button>
                   {this.props.participant.identity} (You)
                 </div>
               </div>
