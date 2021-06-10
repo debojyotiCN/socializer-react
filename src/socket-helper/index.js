@@ -24,6 +24,12 @@ class SocketHelper {
     SocketHelper.socketRef.on("session-complete", payload => {
       EventEmitter.trigger("session-complete", {});
     });
+    SocketHelper.socketRef.on("next-question-arriving", payload => {
+      EventEmitter.trigger("next-question-arriving", payload);
+    });
+    SocketHelper.socketRef.on("questions-assigned", questions => {
+      EventEmitter.trigger("questions-assigned", questions);
+    });
   }
 
   static postAnswer(answerPayload) {

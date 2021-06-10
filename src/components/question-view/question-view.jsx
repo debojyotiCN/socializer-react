@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import "./question-view.scss";
-import EventEmitter from "../../utils/event-emitter";
-import SocketHelper from "../../socket-helper";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { showToast } from "../../helper-methods";
-import { CircularProgressbar } from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
+import SocketHelper from "../../socket-helper";
+import EventEmitter from "../../utils/event-emitter";
+import QuestionProgressTracker from "../question-progress-tracker/question-progress-tracker";
+import "./question-view.scss";
+import QuestionLoader from "../question-loader/question-loader";
 
 class QuestionView extends Component {
   state = {
@@ -13,6 +13,10 @@ class QuestionView extends Component {
     isSessionStarted: false,
     isSessionComplete: false,
     selectedAnswerId: null,
+    totalQuestionCount: 0,
+    activeQuestionNumber: 0,
+    activateNextQuestionLoader: false,
+    loaderDelay: 0,
   };
 
   componentDidMount() {
@@ -29,11 +33,15 @@ class QuestionView extends Component {
       });
     });
     EventEmitter.listen("new-question", (question) => {
+      const { activeQuestionNumber } = this.state;
+
       this.setState({
         question: question,
         isSessionStarted: true,
         isSessionComplete: false,
         selectedAnswerId: null,
+        activeQuestionNumber: activeQuestionNumber + 1,
+        activateNextQuestionLoader: false,
       });
     });
     EventEmitter.listen("session-complete", (payload) => {
@@ -41,6 +49,19 @@ class QuestionView extends Component {
         question: null,
         isSessionStarted: true,
         isSessionComplete: true,
+      });
+    });
+    EventEmitter.listen("questions-assigned", (questions) => {
+      this.setState({
+        totalQuestionCount: questions.length,
+        activeQuestionNumber: 0,
+        activateNextQuestionLoader: false,
+      });
+    });
+    EventEmitter.listen("next-question-arriving", (payload) => {
+      this.setState({
+        activateNextQuestionLoader: true,
+        loaderDelay: payload.delaySeconds,
       });
     });
   };
@@ -78,6 +99,10 @@ class QuestionView extends Component {
       selectedAnswerId,
       isSessionStarted,
       isSessionComplete,
+      totalQuestionCount,
+      activeQuestionNumber,
+      activateNextQuestionLoader,
+      loaderDelay,
     } = this.state;
     const percentage = 10;
 
@@ -130,18 +155,10 @@ class QuestionView extends Component {
                   <>
                     {question ? (
                       <>
-                        <div className="questionMeta">
-                          <h4>Questions: 1 of 5</h4>
-                          <div className="progress-container">
-                            <div className="progress" id="progress" style={{width: "25%"}} />
-                            <div className="circle active">1</div>
-                            <div className="circle active">2</div>
-                            <div className="circle">3</div>
-                            <div className="circle">4</div>
-                            <div className="circle">5</div>
-                          </div>
-                         
-                        </div>
+                        <QuestionProgressTracker
+                          totalQuestionCount={totalQuestionCount}
+                          activeQuestionNumber={activeQuestionNumber}
+                        />
                         <h3>{question.questionText}</h3>
                         <div className="answers">
                           {question.answers.map((answer, answerIndex) => (
@@ -154,15 +171,10 @@ class QuestionView extends Component {
                             </div>
                           ))}
                         </div>
-                        <div className="nextQuestionAlert">
-                            <div className="progressbar">
-                              <CircularProgressbar
-                                value={percentage}
-                                strokeWidth={30}
-                              />
-                            </div>
-                              <div className="label">Next question in 10 s</div>
-                          </div>
+                        <QuestionLoader
+                          activate={activateNextQuestionLoader}
+                          seconds={loaderDelay}
+                        />
                       </>
                     ) : (
                       <h3>Starting the session</h3>
