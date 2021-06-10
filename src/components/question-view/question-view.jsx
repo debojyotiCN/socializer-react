@@ -4,6 +4,8 @@ import EventEmitter from "../../utils/event-emitter";
 import SocketHelper from "../../socket-helper";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { showToast } from "../../helper-methods";
+import { CircularProgressbar } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
 
 class QuestionView extends Component {
   state = {
@@ -77,6 +79,7 @@ class QuestionView extends Component {
       isSessionStarted,
       isSessionComplete,
     } = this.state;
+    const percentage = 10;
 
     return (
       <>
@@ -127,6 +130,18 @@ class QuestionView extends Component {
                   <>
                     {question ? (
                       <>
+                        <div className="questionMeta">
+                          <h4>Questions: 1 of 5</h4>
+                          <div className="progress-container">
+                            <div className="progress" id="progress" style={{width: "25%"}} />
+                            <div className="circle active">1</div>
+                            <div className="circle active">2</div>
+                            <div className="circle">3</div>
+                            <div className="circle">4</div>
+                            <div className="circle">5</div>
+                          </div>
+                         
+                        </div>
                         <h3>{question.questionText}</h3>
                         <div className="answers">
                           {question.answers.map((answer, answerIndex) => (
@@ -139,6 +154,15 @@ class QuestionView extends Component {
                             </div>
                           ))}
                         </div>
+                        <div className="nextQuestionAlert">
+                            <div className="progressbar">
+                              <CircularProgressbar
+                                value={percentage}
+                                strokeWidth={30}
+                              />
+                            </div>
+                              <div className="label">Next question in 10 s</div>
+                          </div>
                       </>
                     ) : (
                       <h3>Starting the session</h3>

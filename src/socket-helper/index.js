@@ -8,7 +8,7 @@ class SocketHelper {
   
   static connect(roomId, userName) {
     // SocketHelper.socketRef = io("http://localhost:5555");
-    SocketHelper.socketRef = io("http://3.101.76.245");
+    SocketHelper.socketRef = io("https://socializer.letsconnect.solutions");
     SocketHelper.socketRef.emit("join", {roomId: roomId, userName: userName});
     SocketHelper.roomId = roomId;
     SocketHelper.userName = userName;

@@ -44,7 +44,7 @@ class VideoCallView extends Component {
     try {
       const token = await getVideoCallToken(identity, roomId);
       const room = await TwilioConnect(token, {
-        name: "roomName",
+        name: roomId,
         audio: true,
         video: true,
       });
